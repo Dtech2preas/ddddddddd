@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+const html = `<!DOCTYPE html>
 <html lang="en">
 <head>
   <script src='//libtl.com/sdk.js' data-zone='9601506' data-sdk='show_9601506'></script>
@@ -384,7 +384,7 @@
     function addLog(message, type = 'info') {
       const logContainer = document.getElementById('logContainer');
       const logEntry = document.createElement('div');
-      logEntry.className = `log-entry ${type}`;
+      logEntry.className = \`log-entry \${type}\`;
       logEntry.textContent = message;
       logContainer.appendChild(logEntry);
       logContainer.scrollTop = logContainer.scrollHeight;
@@ -392,7 +392,7 @@
 
     // Update progress bar
     function updateProgress(percent) {
-      document.getElementById('progressBar').style.width = `${percent}%`;
+      document.getElementById('progressBar').style.width = \`\${percent}%\`;
     }
 
     // Show loading state
@@ -400,19 +400,19 @@
       const btn = document.querySelector('.btn-primary');
       btn.disabled = isLoading;
       if (isLoading) {
-        btn.innerHTML = `
+        btn.innerHTML = \`
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M21 12a9 9 0 1 1-6.219-8.56" />
           </svg>
           Fetching...
-        `;
+        \`;
       } else {
-        btn.innerHTML = `
+        btn.innerHTML = \`
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M21 12a9 9 0 0 1-9 9m9-9a9 9 0 0 0-9-9m9 9H3m9 9a9 9 0 0 1-9-9m9 9c1.66 0 3-4.03 3-9s-1.34-9-3-9m0 18c-1.66 0-3-4.03-3-9s1.34-9 3-9m-9 9a9 9 0 0 1 9-9"></path>
           </svg>
           Fetch
-        `;
+        \`;
       }
     }
 
@@ -427,7 +427,7 @@
           // Remove any existing query params to start fresh, or just append?
           // We want the worker to handle ?url=...
           // If we serve from worker root, search is empty.
-          url.search = `?url=${encodeURIComponent(targetUrl)}`;
+          url.search = \`?url=\${encodeURIComponent(targetUrl)}\`;
           return url.href;
         } else {
           throw new Error("Configuration needed: Please set CF_WORKER_URL in the script to use the Cloudflare Worker proxy.");
@@ -441,7 +441,7 @@
         return urlObj.href;
       } catch (e) {
         // Fallback for simple string concatenation if URL parsing fails (e.g. relative path)
-        return `${workerUrl}${workerUrl.includes('?') ? '&' : '?'}url=${encodeURIComponent(targetUrl)}`;
+        return \`\${workerUrl}\${workerUrl.includes('?') ? '&' : '?'}url=\${encodeURIComponent(targetUrl)}\`;
       }
     }
 
@@ -449,9 +449,9 @@
     async function fetchContent(url, options = {}) {
       try {
         // Try direct fetch first (works for local files if CORS allows)
-        addLog(`Fetching: ${url}`, 'info');
+        addLog(\`Fetching: \${url}\`, 'info');
         const response = await fetch(url, options);
-        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+        if (!response.ok) throw new Error(\`HTTP error! status: \${response.status}\`);
         return await response.text();
       } catch (e) {
         // Fall back to proxy for remote URLs if direct fetch fails
@@ -461,12 +461,12 @@
 
         try {
             const proxyUrl = getProxyUrl(url);
-            addLog(`Using Cloudflare Worker proxy...`, 'info');
+            addLog(\`Using Cloudflare Worker proxy...\`, 'info');
             const response = await fetch(proxyUrl);
-            if (!response.ok) throw new Error(`Status ${response.status}`);
+            if (!response.ok) throw new Error(\`Status \${response.status}\`);
             return await response.text();
         } catch (proxyError) {
-            throw new Error(`Proxy failed: ${proxyError.message}`);
+            throw new Error(\`Proxy failed: \${proxyError.message}\`);
         }
       }
     }
@@ -474,9 +474,9 @@
     // Fetch binary content (for images, fonts, etc.)
     async function fetchBinary(url, options = {}) {
       try {
-        addLog(`Fetching binary: ${url}`, 'info');
+        addLog(\`Fetching binary: \${url}\`, 'info');
         const response = await fetch(url, options);
-        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+        if (!response.ok) throw new Error(\`HTTP error! status: \${response.status}\`);
         return await response.blob();
       } catch (e) {
         if (!url.startsWith('http')) {
@@ -485,12 +485,12 @@
 
         try {
             const proxyUrl = getProxyUrl(url);
-            addLog(`Using proxy for binary...`, 'info');
+            addLog(\`Using proxy for binary...\`, 'info');
             const response = await fetch(proxyUrl);
-            if (!response.ok) throw new Error(`Status ${response.status}`);
+            if (!response.ok) throw new Error(\`Status \${response.status}\`);
             return await response.blob();
         } catch (proxyError) {
-             throw new Error(`Proxy failed for binary: ${proxyError.message}`);
+             throw new Error(\`Proxy failed for binary: \${proxyError.message}\`);
         }
       }
     }
@@ -503,7 +503,7 @@
         return;
       }
 
-      addLog(`Processing ${stylesheets.length} CSS files...`, 'info');
+      addLog(\`Processing \${stylesheets.length} CSS files...\`, 'info');
       updateProgress(10);
 
       for (const [index, link] of stylesheets.entries()) {
@@ -512,7 +512,7 @@
 
         try {
           const cssUrl = href.startsWith('http') ? href : new URL(href, basePath).href;
-          addLog(`[${index+1}/${stylesheets.length}] Loading CSS: ${cssUrl}`, 'info');
+          addLog(\`[\${index+1}/\${stylesheets.length}] Loading CSS: \${cssUrl}\`, 'info');
 
           let cssContent = await fetchContent(cssUrl);
 
@@ -521,17 +521,17 @@
 
           // Create style tag with the CSS content
           const style = document.createElement('style');
-          style.textContent = `/* Inlined from ${cssUrl} */\n${cssContent}`;
+          style.textContent = \`/* Inlined from \${cssUrl} */\\n\${cssContent}\`;
           link.replaceWith(style);
 
-          addLog(`[${index+1}/${stylesheets.length}] CSS inlined successfully`, 'success');
+          addLog(\`[\${index+1}/\${stylesheets.length}] CSS inlined successfully\`, 'success');
           updateProgress(10 + ((index + 1) / stylesheets.length * 40));
         } catch (e) {
-          addLog(`Failed to load CSS: ${href} - ${e.message}`, 'error');
+          addLog(\`Failed to load CSS: \${href} - \${e.message}\`, 'error');
           // If we can't fetch, keep the original link but fix the path
           if (document.getElementById('fixPaths').checked && !href.startsWith('http')) {
             link.href = new URL(href, basePath).href;
-            addLog(`Kept original CSS link with fixed path: ${link.href}`, 'warning');
+            addLog(\`Kept original CSS link with fixed path: \${link.href}\`, 'warning');
           }
         }
       }
@@ -539,7 +539,7 @@
 
     // Recursively process @import rules in CSS
     async function processImports(cssContent, baseUrl) {
-      const importRegex = /@import\s+(url\()?['"]([^'"]+)['"]\)?[^;]*;/g;
+      const importRegex = /@import\\s+(url\\()?['"]([^'"]+)['"]\\)?[^;]*;/g;
       let match;
       let processedCSS = cssContent;
 
@@ -547,19 +547,19 @@
         const importPath = match[2];
         try {
           const importUrl = importPath.startsWith('http') ? importPath : new URL(importPath, baseUrl).href;
-          addLog(`Processing CSS import: ${importUrl}`, 'info');
+          addLog(\`Processing CSS import: \${importUrl}\`, 'info');
 
           const importedCSS = await fetchContent(importUrl);
           const processedImport = await processImports(importedCSS, importUrl);
 
           processedCSS = processedCSS.replace(match[0], processedImport);
         } catch (e) {
-          addLog(`Failed to process CSS import: ${importPath} - ${e.message}`, 'error');
+          addLog(\`Failed to process CSS import: \${importPath} - \${e.message}\`, 'error');
           // If import fails, keep the original @import but fix the path if needed
           if (document.getElementById('fixPaths').checked && !importPath.startsWith('http')) {
             const fixedImport = match[0].replace(importPath, new URL(importPath, baseUrl).href);
             processedCSS = processedCSS.replace(match[0], fixedImport);
-            addLog(`Kept original @import with fixed path`, 'warning');
+            addLog(\`Kept original @import with fixed path\`, 'warning');
           }
         }
       }
@@ -575,7 +575,7 @@
         return;
       }
 
-      addLog(`Processing ${images.length} images...`, 'info');
+      addLog(\`Processing \${images.length} images...\`, 'info');
       updateProgress(50);
 
       for (const [index, element] of images.entries()) {
@@ -583,16 +583,16 @@
           // Handle regular img tags
           if (element.tagName === 'IMG') {
             await processImgElement(element, basePath);
-          } 
+          }
           // Handle background images
           else if (element.style.backgroundImage) {
             await processBackgroundImage(element, basePath);
           }
 
-          addLog(`[${index+1}/${images.length}] Image processed successfully`, 'success');
+          addLog(\`[\${index+1}/\${images.length}] Image processed successfully\`, 'success');
           updateProgress(50 + ((index + 1) / images.length * 40));
         } catch (e) {
-          addLog(`Failed to process image: ${e.message}`, 'error');
+          addLog(\`Failed to process image: \${e.message}\`, 'error');
         }
       }
     }
@@ -609,10 +609,10 @@
           const blob = await fetchBinary(imgUrl);
           img.src = await blobToDataURL(blob);
         } catch (e) {
-          addLog(`Failed to inline image src: ${src} - ${e.message}`, 'error');
+          addLog(\`Failed to inline image src: \${src} - \${e.message}\`, 'error');
           if (document.getElementById('fixPaths').checked && !src.startsWith('http')) {
             img.src = new URL(src, basePath).href;
-            addLog(`Kept original src with fixed path: ${img.src}`, 'warning');
+            addLog(\`Kept original src with fixed path: \${img.src}\`, 'warning');
           }
         }
       }
@@ -623,11 +623,11 @@
           const newSrcset = await processSrcset(srcset, basePath);
           img.setAttribute('srcset', newSrcset);
         } catch (e) {
-          addLog(`Failed to process srcset: ${srcset} - ${e.message}`, 'error');
+          addLog(\`Failed to process srcset: \${srcset} - \${e.message}\`, 'error');
           if (document.getElementById('fixPaths').checked) {
             const fixedSrcset = fixSrcsetPaths(srcset, basePath);
             img.setAttribute('srcset', fixedSrcset);
-            addLog(`Kept original srcset with fixed paths`, 'warning');
+            addLog(\`Kept original srcset with fixed paths\`, 'warning');
           }
         }
       }
@@ -636,7 +636,7 @@
     // Process background images
     async function processBackgroundImage(element, basePath) {
       const bgImage = element.style.backgroundImage;
-      const urlMatch = bgImage.match(/url\(['"]?(.*?)['"]?\)/);
+      const urlMatch = bgImage.match(/url\\(['"]?(.*?)['"]?\\)/);
 
       if (urlMatch && urlMatch[1]) {
         const imageUrl = urlMatch[1];
@@ -645,12 +645,12 @@
             const fullUrl = imageUrl.startsWith('http') ? imageUrl : new URL(imageUrl, basePath).href;
             const blob = await fetchBinary(fullUrl);
             const dataUrl = await blobToDataURL(blob);
-            element.style.backgroundImage = `url("${dataUrl}")`;
+            element.style.backgroundImage = \`url("\${dataUrl}")\`;
           } catch (e) {
-            addLog(`Failed to inline background image: ${imageUrl} - ${e.message}`, 'error');
+            addLog(\`Failed to inline background image: \${imageUrl} - \${e.message}\`, 'error');
             if (document.getElementById('fixPaths').checked && !imageUrl.startsWith('http')) {
-              element.style.backgroundImage = `url("${new URL(imageUrl, basePath).href}")`;
-              addLog(`Kept original background image with fixed path`, 'warning');
+              element.style.backgroundImage = \`url("\${new URL(imageUrl, basePath).href}")\`;
+              addLog(\`Kept original background image with fixed path\`, 'warning');
             }
           }
         }
@@ -663,19 +663,19 @@
       const processedParts = [];
 
       for (const part of parts) {
-        const [url, descriptor] = part.trim().split(/\s+/);
+        const [url, descriptor] = part.trim().split(/\\s+/);
         if (!url) continue;
 
         try {
           const fullUrl = url.startsWith('http') ? url : new URL(url, basePath).href;
           const blob = await fetchBinary(fullUrl);
           const dataUrl = await blobToDataURL(blob);
-          processedParts.push(`${dataUrl}${descriptor ? ' ' + descriptor : ''}`);
+          processedParts.push(\`\${dataUrl}\${descriptor ? ' ' + descriptor : ''}\`);
         } catch (e) {
-          addLog(`Failed to inline srcset image: ${url} - ${e.message}`, 'error');
+          addLog(\`Failed to inline srcset image: \${url} - \${e.message}\`, 'error');
           if (document.getElementById('fixPaths').checked && !url.startsWith('http')) {
-            processedParts.push(`${new URL(url, basePath).href}${descriptor ? ' ' + descriptor : ''}`);
-            addLog(`Kept original srcset URL with fixed path`, 'warning');
+            processedParts.push(\`\${new URL(url, basePath).href}\${descriptor ? ' ' + descriptor : ''}\`);
+            addLog(\`Kept original srcset URL with fixed path\`, 'warning');
           } else {
             processedParts.push(part.trim());
           }
@@ -688,11 +688,11 @@
     // Fix paths in srcset without inlining
     function fixSrcsetPaths(srcset, basePath) {
       return srcset.split(',').map(part => {
-        const [url, descriptor] = part.trim().split(/\s+/);
+        const [url, descriptor] = part.trim().split(/\\s+/);
         if (!url || url.startsWith('http') || url.startsWith('data:')) {
           return part.trim();
         }
-        return `${new URL(url, basePath).href}${descriptor ? ' ' + descriptor : ''}`;
+        return \`\${new URL(url, basePath).href}\${descriptor ? ' ' + descriptor : ''}\`;
       }).join(', ');
     }
 
@@ -727,7 +727,7 @@
         return;
       }
 
-      addLog(`Processing ${scripts.length} scripts...`, 'info');
+      addLog(\`Processing \${scripts.length} scripts...\`, 'info');
 
       for (const [index, script] of scripts.entries()) {
         const src = script.getAttribute('src');
@@ -735,22 +735,22 @@
 
         try {
           const scriptUrl = src.startsWith('http') ? src : new URL(src, basePath).href;
-          addLog(`[${index+1}/${scripts.length}] Loading script: ${scriptUrl}`, 'info');
+          addLog(\`[\${index+1}/\${scripts.length}] Loading script: \${scriptUrl}\`, 'info');
 
           const scriptContent = await fetchContent(scriptUrl);
 
           // Create new script tag with the content
           const newScript = document.createElement('script');
-          newScript.textContent = `/* Inlined from ${scriptUrl} */\n${scriptContent}`;
+          newScript.textContent = \`/* Inlined from \${scriptUrl} */\\n\${scriptContent}\`;
           script.replaceWith(newScript);
 
-          addLog(`[${index+1}/${scripts.length}] Script inlined successfully`, 'success');
+          addLog(\`[\${index+1}/\${scripts.length}] Script inlined successfully\`, 'success');
         } catch (e) {
-          addLog(`Failed to load script: ${src} - ${e.message}`, 'error');
+          addLog(\`Failed to load script: \${src} - \${e.message}\`, 'error');
           // If we can't fetch, keep the original script but fix the path
           if (document.getElementById('fixPaths').checked && !src.startsWith('http')) {
             script.src = new URL(src, basePath).href;
-            addLog(`Kept original script with fixed path: ${script.src}`, 'warning');
+            addLog(\`Kept original script with fixed path: \${script.src}\`, 'warning');
           }
         }
       }
@@ -769,10 +769,10 @@
             favicon.href = await blobToDataURL(blob);
             addLog('Favicon inlined successfully', 'success');
           } catch (e) {
-            addLog(`Failed to inline favicon: ${href} - ${e.message}`, 'error');
+            addLog(\`Failed to inline favicon: \${href} - \${e.message}\`, 'error');
             if (document.getElementById('fixPaths').checked && !href.startsWith('http')) {
               favicon.href = new URL(href, basePath).href;
-              addLog(`Kept original favicon with fixed path: ${favicon.href}`, 'warning');
+              addLog(\`Kept original favicon with fixed path: \${favicon.href}\`, 'warning');
             }
           }
         }
@@ -792,8 +792,8 @@
 
     // Process @font-face rules in CSS
     async function processFontsInCSS(cssContent, basePath) {
-      const fontFaceRegex = /(@font-face\s*\{[^}]+\})/g;
-      const srcRegex = /src:\s*(url\()?['"]([^'"]+)['"]\)?([^;]*);/g;
+      const fontFaceRegex = /(@font-face\\s*\\{[^}]+\\})/g;
+      const srcRegex = /src:\\s*(url\\()?['"]([^'"]+)['"]\\)?([^;]*);/g;
       let processedCSS = cssContent;
       let match;
 
@@ -810,16 +810,16 @@
             const fullFontUrl = fontUrl.startsWith('http') ? fontUrl : new URL(fontUrl, basePath).href;
             const blob = await fetchBinary(fullFontUrl);
             const dataUrl = await blobToDataURL(blob);
-            processedRule = processedRule.replace(srcMatch[0], `src: url("${dataUrl}")${srcMatch[3]};`);
-            addLog(`Inlined font: ${fontUrl}`, 'success');
+            processedRule = processedRule.replace(srcMatch[0], \`src: url("\${dataUrl}")\${srcMatch[3]};\`);
+            addLog(\`Inlined font: \${fontUrl}\`, 'success');
           } catch (e) {
-            addLog(`Failed to inline font: ${fontUrl} - ${e.message}`, 'error');
+            addLog(\`Failed to inline font: \${fontUrl} - \${e.message}\`, 'error');
             if (document.getElementById('fixPaths').checked && !fontUrl.startsWith('http')) {
               processedRule = processedRule.replace(
-                srcMatch[0], 
-                `src: url("${new URL(fontUrl, basePath).href}")${srcMatch[3]};`
+                srcMatch[0],
+                \`src: url("\${new URL(fontUrl, basePath).href}")\${srcMatch[3]};\`
               );
-              addLog(`Kept original font with fixed path`, 'warning');
+              addLog(\`Kept original font with fixed path\`, 'warning');
             }
           }
         }
@@ -835,18 +835,18 @@
       addLog('Building final HTML structure...', 'info');
 
       // Ensure proper HTML structure
-      const html = `<!DOCTYPE html>
+      const html = \`<!DOCTYPE html>
 <html>
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>${doc.title || 'Downloaded Page'}</title>
-  ${getHeadContent(doc)}
+  <title>\${doc.title || 'Downloaded Page'}</title>
+  \${getHeadContent(doc)}
 </head>
 <body>
-  ${getBodyContent(doc)}
+  \${getBodyContent(doc)}
 </body>
-</html>`;
+</html>\`;
 
       return html;
     }
@@ -858,7 +858,7 @@
       // Copy all elements except title and viewport (we handle those separately)
       for (const child of head.children) {
         if (child.tagName !== 'TITLE' && child.getAttribute('name') !== 'viewport') {
-          content += child.outerHTML + '\n';
+          content += child.outerHTML + '\\n';
         }
       }
 
@@ -885,7 +885,7 @@
         document.getElementById('stage2Btn').disabled = true;
         document.getElementById('logContainer').innerHTML = '';
         updateProgress(0);
-        addLog(`Starting fetch for: ${url}`, 'info');
+        addLog(\`Starting fetch for: \${url}\`, 'info');
 
         // Get the HTML content
         const html = await fetchContent(url);
@@ -897,7 +897,7 @@
 
         // Get base path for relative URLs
         const basePath = getBasePath(url);
-        addLog(`Using base path: ${basePath}`, 'info');
+        addLog(\`Using base path: \${basePath}\`, 'info');
 
         // Process resources based on options
         if (document.getElementById('inlineCSS').checked) {
@@ -930,7 +930,7 @@
         updateProgress(100);
         addLog('Page processed successfully! Ready for download or Stage 2.', 'success');
       } catch (err) {
-        addLog(`Error: ${err.message}`, 'error');
+        addLog(\`Error: \${err.message}\`, 'error');
         console.error(err);
       } finally {
         setLoading(false);
@@ -970,7 +970,7 @@
     function getBasePath(url) {
       if (url.startsWith('http')) {
         const urlObj = new URL(url);
-        return `${urlObj.protocol}//${urlObj.host}${urlObj.pathname.split('/').slice(0, -1).join('/')}/`;
+        return \`\${urlObj.protocol}//\${urlObj.host}\${urlObj.pathname.split('/').slice(0, -1).join('/')}/\`;
       }
       // For local paths, get directory path
       const lastSlash = url.lastIndexOf('/');
@@ -985,7 +985,7 @@
       const url = URL.createObjectURL(blob);
 
       const filename = getDownloadFilename();
-      addLog(`Downloading: ${filename}`, 'info');
+      addLog(\`Downloading: \${filename}\`, 'info');
 
       const a = document.createElement('a');
       a.href = url;
@@ -1006,12 +1006,12 @@
       if (url.startsWith('http')) {
         const domain = new URL(url).hostname.replace('www.', '');
         const path = new URL(url).pathname.split('/').pop();
-        return path ? `${domain}_${path}` : `${domain}.html`;
+        return path ? \`\${domain}_\${path}\` : \`\${domain}.html\`;
       }
 
       // For local paths
       const filename = url.split('/').pop();
-      return filename.endsWith('.html') ? filename : `${filename}.html`;
+      return filename.endsWith('.html') ? filename : \`\${filename}.html\`;
     }
 
     // Copy to clipboard
@@ -1022,21 +1022,21 @@
 
       // Show temporary feedback
       const copyBtn = document.querySelector('.copy-btn');
-      copyBtn.innerHTML = `
+      copyBtn.innerHTML = \`
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <polyline points="20 6 9 17 4 12"></polyline>
         </svg>
         Copied!
-      `;
+      \`;
 
       setTimeout(() => {
-        copyBtn.innerHTML = `
+        copyBtn.innerHTML = \`
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
             <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
           </svg>
           Copy
-        `;
+        \`;
       }, 2000);
 
       addLog('HTML copied to clipboard', 'success');
@@ -1062,3 +1062,64 @@
 
 </body>
 </html>
+`;
+
+export default {
+  async fetch(request, env, ctx) {
+    const url = new URL(request.url);
+    const targetUrl = url.searchParams.get('url');
+
+    // 1. Handle Proxy Request
+    if (targetUrl) {
+      try {
+        // We strip headers that might block us and add CORS
+
+        // Prepare request to target
+        const headers = new Headers(request.headers);
+
+        // Set proper User-Agent if missing
+        if (!headers.get('User-Agent')) {
+            headers.set('User-Agent', 'Mozilla/5.0 (compatible; Cloudflare-Worker-Proxy/1.0)');
+        }
+
+        // Remove origin/referer to avoid leakage/blocking
+        headers.delete('Origin');
+        headers.delete('Referer');
+
+        const response = await fetch(targetUrl, {
+            method: request.method,
+            headers: headers,
+            redirect: 'follow'
+        });
+
+        // Re-create response to modify headers (CORS)
+        const newResponse = new Response(response.body, response);
+        newResponse.headers.set('Access-Control-Allow-Origin', '*');
+        newResponse.headers.set('Access-Control-Allow-Methods', 'GET, HEAD, POST, OPTIONS');
+        newResponse.headers.set('Access-Control-Allow-Headers', '*');
+
+        return newResponse;
+      } catch (e) {
+        return new Response('Proxy Error: ' + e.message, { status: 500, headers: { 'Access-Control-Allow-Origin': '*' } });
+      }
+    }
+
+    // 2. Handle OPTIONS (CORS Preflight)
+    if (request.method === "OPTIONS") {
+      return new Response(null, {
+        headers: {
+          "Access-Control-Allow-Origin": "*",
+          "Access-Control-Allow-Methods": "GET, HEAD, POST, OPTIONS",
+          "Access-Control-Allow-Headers": "*",
+        }
+      })
+    }
+
+    // 3. Handle UI Request (Serve HTML)
+    return new Response(html, {
+      headers: {
+        'content-type': 'text/html;charset=UTF-8'
+      },
+    });
+  }
+}
