@@ -831,16 +831,29 @@ const html = `<!DOCTYPE html>
     }
 
     // Build final HTML document
+    function escapeHTML(str) {
+      return str.replace(/[&<>'"]/g,
+        tag => ({
+            '&': '&amp;',
+            '<': '&lt;',
+            '>': '&gt;',
+            "'": '&#39;',
+            '"': '&quot;'
+          }[tag] || tag)
+      );
+    }
+
     function buildFinalHTML(doc) {
       addLog('Building final HTML structure...', 'info');
 
       // Ensure proper HTML structure
+      const safeTitle = doc.title ? escapeHTML(doc.title) : 'Downloaded Page';
       const html = \`<!DOCTYPE html>
 <html>
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>\${doc.title || 'Downloaded Page'}</title>
+  <title>\${safeTitle}</title>
   \${getHeadContent(doc)}
 </head>
 <body>
@@ -883,7 +896,7 @@ const html = `<!DOCTYPE html>
         document.getElementById('output').value = '';
         document.getElementById('downloadBtn').disabled = true;
         document.getElementById('stage2Btn').disabled = true;
-        document.getElementById('logContainer').innerHTML = '';
+        document.getElementById('logContainer').textContent = '';
         updateProgress(0);
         addLog(\`Starting fetch for: \${url}\`, 'info');
 
@@ -1072,6 +1085,12 @@ export default {
     // 1. Handle Proxy Request
     if (targetUrl) {
       try {
+        // Validate URL to prevent SSRF and restrict to http/https
+        const parsedTargetUrl = new URL(targetUrl);
+        if (parsedTargetUrl.protocol !== 'http:' && parsedTargetUrl.protocol !== 'https:') {
+          return new Response('Invalid URL protocol', { status: 400, headers: { 'Access-Control-Allow-Origin': '*' } });
+        }
+
         // We strip headers that might block us and add CORS
 
         // Prepare request to target
